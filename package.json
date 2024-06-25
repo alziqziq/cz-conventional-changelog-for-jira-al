@@ -1,6 +1,6 @@
 {
-  "name": "@digitalroute/cz-conventional-changelog-for-jira",
-  "version": "0.0.0-semantically-released",
+  "name": "cz-conventional-changelog-for-jira-al",
+  "version": "0.0.0",
   "description": "Commitizen adapter following the conventional-changelog format and also asking for JIRA issue.",
   "main": "index.js",
   "scripts": {
@@ -9,16 +9,16 @@
     "format": "prettier --write *.js",
     "semantic-release": "semantic-release"
   },
-  "homepage": "https://github.com/digitalroute/cz-conventional-changelog-for-jira",
+  "homepage": "https://github.com/alziqziq/cz-conventional-changelog-for-jira-al",
   "repository": {
     "type": "git",
-    "url": "https://github.com/digitalroute/cz-conventional-changelog-for-jira.git"
+    "url": "https://github.com/alziqziq/cz-conventional-changelog-for-jira-al.git"
   },
   "engineStrict": true,
   "engines": {
-    "node": ">= 10"
+    "node": ">= 16"
   },
-  "author": "Marcus Johansson <polarn@gmail.com>",
+  "author": "Muhammad Al Ziqri <alziqziq@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "boxen": "^5.1.2",
@@ -48,8 +48,7 @@
   "config": {
     "commitizen": {
       "path": "./index.js",
-      "jiraMode": false,
-      "skipScope": true
+      "jiraMode": false
     }
   },
   "publishConfig": {

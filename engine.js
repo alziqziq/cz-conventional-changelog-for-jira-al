@@ -89,7 +89,7 @@ module.exports = function(options) {
     options.scopes &&
     Array.isArray(options.scopes) &&
     options.scopes.length > 0;
-  const customScope = !options.skipScope && hasScopes && options.customScope;
+  const customScope = hasScopes && options.customScope;
   const scopes = customScope ? [...options.scopes, 'custom' ]: options.scopes;
 
   var getProvidedScope = function(answers) {
@@ -151,7 +151,6 @@ module.exports = function(options) {
         {
           type: hasScopes ? 'list' : 'input',
           name: 'scope',
-          when: !options.skipScope,
           choices: hasScopes ? scopes : undefined,
           message:
             'What is the scope of this change (e.g. component or file name): ' +

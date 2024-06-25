@@ -3,7 +3,6 @@ var conventionalCommitTypes = require('./types');
 module.exports = {
   types: conventionalCommitTypes,
   jiraMode: true,
-  skipScope: true,
   skipType: false,
   skipDescription: false,
   skipBreaking: false,

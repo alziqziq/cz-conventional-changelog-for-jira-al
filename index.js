@@ -24,11 +24,6 @@ const options = {
     config.jiraMode,
     defaults.jiraMode
   ),
-  skipScope: getEnvOrConfig(
-    process.env.CZ_SKIP_SCOPE,
-    config.skipScope,
-    defaults.skipScope
-  ),
   skipType: getEnvOrConfig(
     process.env.CZ_SKIP_TYPE,
     config.skipType,
