@@ -31,41 +31,6 @@ module.exports = function(options) {
   var getFromOptionsOrDefaults = function(key) {
     return options[key] || defaults[key];
   };
-  var getJiraIssueLocation = function(
-    location,
-    type = '',
-    scope = '',
-    jiraWithDecorators,
-    subject
-  ) {
-    let headerPrefix = type + scope;
-    if (headerPrefix !== '') {
-      headerPrefix += ': ';
-    }
-    switch (location) {
-      case 'pre-type':
-        return jiraWithDecorators + headerPrefix + subject;
-        break;
-      case 'pre-description':
-        return headerPrefix + jiraWithDecorators + subject;
-        break;
-      case 'post-description':
-        return headerPrefix + subject + ' ' + jiraWithDecorators;
-        break;
-      case 'post-body':
-        return headerPrefix + subject;
-        break;
-      default:
-        return headerPrefix + jiraWithDecorators + subject;
-    }
-  };
-
-  // Generate Jira issue prepend and append decorators
-  const decorateJiraIssue = function(jiraIssue, options) {
-    const prepend = options.jiraPrepend || ''
-    const append = options.jiraAppend || ''
-    return jiraIssue ? `${prepend}${jiraIssue}${append} `: '';
-  }
 
   var types = getFromOptionsOrDefaults('types');
 
@@ -80,21 +45,13 @@ module.exports = function(options) {
   const minHeaderWidth = getFromOptionsOrDefaults('minHeaderWidth');
   const maxHeaderWidth = getFromOptionsOrDefaults('maxHeaderWidth');
 
-  const branchName = execSync('git branch --show-current').toString().trim();
+  const branchName = execSync('git branch --show-current')
+    .toString()
+    .trim();
   const jiraIssueRegex = /(?<jiraIssue>(?<!([a-zA-Z0-9]{1,10})-?)[a-zA-Z0-9]+-\d+)/;
   const matchResult = branchName.match(jiraIssueRegex);
   const jiraIssue =
     matchResult && matchResult.groups && matchResult.groups.jiraIssue;
-  const hasScopes =
-    options.scopes &&
-    Array.isArray(options.scopes) &&
-    options.scopes.length > 0;
-  const customScope = hasScopes && options.customScope;
-  const scopes = customScope ? [...options.scopes, 'custom' ]: options.scopes;
-
-  var getProvidedScope = function(answers) {
-    return answers.scope === 'custom' ? answers.customScope : answers.scope;
-  }
 
   return {
     // When a user runs `git cz`, prompter will
@@ -122,10 +79,9 @@ module.exports = function(options) {
         {
           type: 'list',
           name: 'type',
-          when: !options.skipType,
           message: "Select the type of change that you're committing:",
           choices: choices,
-          default: options.skipType ? '' : options.defaultType
+          default: options.defaultType
         },
         {
           type: 'input',
@@ -134,9 +90,7 @@ module.exports = function(options) {
             'Enter JIRA issue (' +
             getFromOptionsOrDefaults('jiraPrefix') +
             '-12345)' +
-            (options.jiraOptional ? ' (optional)' : '') +
             ':',
-          when: options.jiraMode,
           default: jiraIssue || '',
           validate: function(jira) {
             return (
@@ -149,38 +103,15 @@ module.exports = function(options) {
           }
         },
         {
-          type: hasScopes ? 'list' : 'input',
-          name: 'scope',
-          choices: hasScopes ? scopes : undefined,
-          message:
-            'What is the scope of this change (e.g. component or file name): ' +
-            (hasScopes ? '(select from the list)' : '(press enter to skip)'),
-          default: options.defaultScope,
-          filter: function(value) {
-            return value.trim().toLowerCase();
-          }
-        },
-        {
-          type: 'input',
-          name: 'customScope',
-          when: (({ scope }) => scope === 'custom'),
-          message: 'Type custom scope (press enter to skip)'
-        },
-        {
           type: 'limitedInput',
           name: 'subject',
           message: 'Write a short, imperative tense description of the change:',
           default: options.defaultSubject,
           maxLength: maxHeaderWidth - (options.exclamationMark ? 1 : 0),
           leadingLabel: answers => {
-            let scope = '';
-            const providedScope = getProvidedScope(answers);
-            if (providedScope && providedScope !== 'none') {
-              scope = `(${providedScope})`;
-            }
+            let scope = `(${answers.jira})`;
 
-            const jiraWithDecorators = decorateJiraIssue(answers.jira, options);
-            return getJiraIssueLocation(options.jiraLocation, answers.type, scope, jiraWithDecorators, '').trim();
+            return answers.type + scope + ': '.trim();
           },
           validate: input =>
             input.length >= minHeaderWidth ||
@@ -207,7 +138,8 @@ module.exports = function(options) {
         {
           type: 'confirm',
           name: 'isBreaking',
-          message: 'You do know that this will bump the major version, are you sure?',
+          message:
+            'You do know that this will bump the major version, are you sure?',
           default: false,
           when: function(answers) {
             return answers.isBreaking;
@@ -220,14 +152,6 @@ module.exports = function(options) {
           when: function(answers) {
             return answers.isBreaking;
           }
-        },
-
-        {
-          type: 'confirm',
-          name: 'isIssueAffected',
-          message: 'Does this change affect any open issues?',
-          default: options.defaultIssues ? true : false,
-          when: !options.jiraMode
         },
         {
           type: 'input',
@@ -259,28 +183,21 @@ module.exports = function(options) {
           width: options.maxLineWidth
         };
 
-        // parentheses are only needed when a scope is present
-        const providedScope = getProvidedScope(answers);
-        var scope = providedScope ? '(' + providedScope + ')' : '';
+        var scope = `(${answers.jira})`;
 
         const addExclamationMark = options.exclamationMark && answers.breaking;
         scope = addExclamationMark ? scope + '!' : scope;
 
-        // Get Jira issue prepend and append decorators
-        const jiraWithDecorators = decorateJiraIssue(answers.jira, options);
-
         // Hard limit this line in the validate
-        const head = getJiraIssueLocation(options.jiraLocation, answers.type, scope, jiraWithDecorators, answers.subject);
+        const head = answers.type + scope + ': ' + answers.subject;
 
         // Wrap these lines at options.maxLineWidth characters
         var body = answers.body ? wrap(answers.body, wrapOptions) : false;
-        if (options.jiraMode && options.jiraLocation === 'post-body') {
-          if (body === false) {
-            body = '';
-          } else {
-            body += "\n\n";
-          }
-          body += jiraWithDecorators.trim();
+
+        if (body === false) {
+          body = '';
+        } else {
+          body += '\n\n';
         }
 
         // Apply breaking change prefix, removing it if already present

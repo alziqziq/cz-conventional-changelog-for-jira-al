@@ -2,7 +2,6 @@ var conventionalCommitTypes = require('./types');
 
 module.exports = {
   types: conventionalCommitTypes,
-  jiraMode: true,
   skipType: false,
   skipDescription: false,
   skipBreaking: false,
@@ -10,10 +9,6 @@ module.exports = {
   maxHeaderWidth: 72,
   minHeaderWidth: 2,
   maxLineWidth: 100,
-  jiraPrefix: 'DAZ',
-  jiraOptional: false,
-  jiraLocation: 'pre-description',
-  jiraPrepend: '',
-  jiraAppend: '',
+  jiraPrefix: 'MAZ',
   exclamationMark: false
 };

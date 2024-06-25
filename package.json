@@ -47,8 +47,7 @@
   },
   "config": {
     "commitizen": {
-      "path": "./index.js",
-      "jiraMode": false
+      "path": "./index.js"
     }
   },
   "publishConfig": {
