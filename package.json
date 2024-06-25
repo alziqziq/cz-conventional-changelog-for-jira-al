@@ -48,7 +48,7 @@
   "config": {
     "commitizen": {
       "path": "./index.js",
-      "hasBumpVersion": true
+      "customMessage": "bump alpha version - "
     }
   },
   "publishConfig": {

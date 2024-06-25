@@ -52,9 +52,9 @@ module.exports = function(options) {
   const matchResult = branchName.match(jiraIssueRegex);
   const jiraIssue =
     matchResult && matchResult.groups && matchResult.groups.jiraIssue;
-  const getVersion = version =>
-    version && getFromOptionsOrDefaults('hasBumpVersion')
-      ? 'bump alpha version - '
+  const getCustomMessage = answerCustomMessage =>
+    answerCustomMessage
+      ? getFromOptionsOrDefaults('customMessage')
       : '';
 
   return {
@@ -108,10 +108,10 @@ module.exports = function(options) {
         },
         {
           type: 'confirm',
-          name: 'version',
-          message: 'Is this commit for the alpha version?',
+          name: 'customMessage',
+          message: 'Do you want to use custom messages?',
           default: true,
-          when: getFromOptionsOrDefaults('hasBumpVersion') === true
+          when: !!getFromOptionsOrDefaults('customMessage')
         },
         {
           type: 'limitedInput',
@@ -122,9 +122,7 @@ module.exports = function(options) {
           leadingLabel: answers => {
             let scope = `(${answers.jira})`;
 
-            return (
-              answers.type + scope + ': ' + getVersion(answers.version).trim()
-            );
+            return answers.type + scope + ': ' + getCustomMessage(answers.customMessage).trim();
           },
           validate: input =>
             input.length >= minHeaderWidth ||
@@ -203,11 +201,7 @@ module.exports = function(options) {
 
         // Hard limit this line in the validate
         const head =
-          answers.type +
-          scope +
-          ': ' +
-          getVersion(answers.version) +
-          answers.subject;
+          answers.type + scope + ': ' + getCustomMessage(answers.customMessage) + answers.subject;
 
         // Wrap these lines at options.maxLineWidth characters
         var body = answers.body ? wrap(answers.body, wrapOptions) : false;

@@ -11,5 +11,5 @@ module.exports = {
   maxLineWidth: 100,
   jiraPrefix: 'MAZ',
   exclamationMark: false,
-  hasBumpVersion: false
+  customMessage: '',
 };

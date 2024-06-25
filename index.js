@@ -66,7 +66,7 @@ const options = {
     config.exclamationMark,
     defaults.exclamationMark
   ),
-  hasBumpVersion: process.env.HAS_BUMP_VERSION || config.hasBumpVersion
+  customMessage: process.env.CUSTOM_MESSAGE || config.customMessage
 };
 
 (function(options) {
