@@ -65,7 +65,8 @@ const options = {
     process.env.CZ_EXCLAMATION_MARK,
     config.exclamationMark,
     defaults.exclamationMark
-  )
+  ),
+  hasBumpVersion: process.env.HAS_BUMP_VERSION || config.hasBumpVersion,
 };
 
 (function(options) {

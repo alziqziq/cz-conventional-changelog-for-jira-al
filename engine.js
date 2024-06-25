@@ -52,6 +52,10 @@ module.exports = function(options) {
   const matchResult = branchName.match(jiraIssueRegex);
   const jiraIssue =
     matchResult && matchResult.groups && matchResult.groups.jiraIssue;
+  const getVersion = version =>
+    version === 'alpha' && getFromOptionsOrDefaults('hasBumpVersion') === true
+      ? 'bump alpha version - '
+      : '';
 
   return {
     // When a user runs `git cz`, prompter will
@@ -103,6 +107,22 @@ module.exports = function(options) {
           }
         },
         {
+          type: 'list',
+          name: 'version',
+          message: 'Select the bump version:',
+          choices: [
+            {
+              name: rightPad('Alpha:', 10) + ' Bump to alpha version',
+              value: 'alpha'
+            },
+            {
+              name: rightPad('Stable:', 10) + ' Bump to stable version',
+              value: 'stable'
+            }
+          ],
+          when: getFromOptionsOrDefaults('hasBumpVersion') === true
+        },
+        {
           type: 'limitedInput',
           name: 'subject',
           message: 'Write a short, imperative tense description of the change:',
@@ -111,7 +131,7 @@ module.exports = function(options) {
           leadingLabel: answers => {
             let scope = `(${answers.jira})`;
 
-            return answers.type + scope + ': '.trim();
+            return answers.type + scope + ': ' + getVersion(answers.version).trim();
           },
           validate: input =>
             input.length >= minHeaderWidth ||
@@ -189,7 +209,8 @@ module.exports = function(options) {
         scope = addExclamationMark ? scope + '!' : scope;
 
         // Hard limit this line in the validate
-        const head = answers.type + scope + ': ' + answers.subject;
+        const head =
+          answers.type + scope + ': ' + getVersion(answers.version) + answers.subject;
 
         // Wrap these lines at options.maxLineWidth characters
         var body = answers.body ? wrap(answers.body, wrapOptions) : false;

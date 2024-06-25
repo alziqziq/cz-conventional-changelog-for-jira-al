@@ -10,5 +10,6 @@ module.exports = {
   minHeaderWidth: 2,
   maxLineWidth: 100,
   jiraPrefix: 'MAZ',
-  exclamationMark: false
+  exclamationMark: false,
+  hasBumpVersion: false
 };

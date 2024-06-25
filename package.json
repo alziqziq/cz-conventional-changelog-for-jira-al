@@ -47,7 +47,8 @@
   },
   "config": {
     "commitizen": {
-      "path": "./index.js"
+      "path": "./index.js",
+      "hasBumpVersion": true
     }
   },
   "publishConfig": {
