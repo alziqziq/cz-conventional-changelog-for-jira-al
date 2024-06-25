@@ -53,7 +53,7 @@ module.exports = function(options) {
   const jiraIssue =
     matchResult && matchResult.groups && matchResult.groups.jiraIssue;
   const getVersion = version =>
-    version === 'alpha' && getFromOptionsOrDefaults('hasBumpVersion') === true
+    version && getFromOptionsOrDefaults('hasBumpVersion')
       ? 'bump alpha version - '
       : '';
 
@@ -107,19 +107,10 @@ module.exports = function(options) {
           }
         },
         {
-          type: 'list',
+          type: 'confirm',
           name: 'version',
-          message: 'Select the bump version:',
-          choices: [
-            {
-              name: rightPad('Alpha:', 10) + ' Bump to alpha version',
-              value: 'alpha'
-            },
-            {
-              name: rightPad('Stable:', 10) + ' Bump to stable version',
-              value: 'stable'
-            }
-          ],
+          message: 'Is this commit for the alpha version?',
+          default: true,
           when: getFromOptionsOrDefaults('hasBumpVersion') === true
         },
         {
@@ -131,7 +122,9 @@ module.exports = function(options) {
           leadingLabel: answers => {
             let scope = `(${answers.jira})`;
 
-            return answers.type + scope + ': ' + getVersion(answers.version).trim();
+            return (
+              answers.type + scope + ': ' + getVersion(answers.version).trim()
+            );
           },
           validate: input =>
             input.length >= minHeaderWidth ||
@@ -210,7 +203,11 @@ module.exports = function(options) {
 
         // Hard limit this line in the validate
         const head =
-          answers.type + scope + ': ' + getVersion(answers.version) + answers.subject;
+          answers.type +
+          scope +
+          ': ' +
+          getVersion(answers.version) +
+          answers.subject;
 
         // Wrap these lines at options.maxLineWidth characters
         var body = answers.body ? wrap(answers.body, wrapOptions) : false;
